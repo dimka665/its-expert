@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from its_expert.models import ObjectX
+
+
+admin.site.register(ObjectX)

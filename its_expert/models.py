@@ -1,16 +1,37 @@
+from django.contrib.contenttypes import generic
+from django.db.models import PositiveIntegerField, ForeignKey
 
-from django.db.models import Model
-from django.db.models import PositiveIntegerField
+from eav.models import BaseSchema, BaseEntity, BaseAttribute, BaseChoice
 
 
-class ObjectX(Model):
-    height = PositiveIntegerField()
-    width = PositiveIntegerField()
+class Schema(BaseSchema):
+    pass
+
+
+class Choice(BaseChoice):
+    schema = ForeignKey(Schema, related_name='choices')
+
+
+class Attribute(BaseAttribute):
+    schema = ForeignKey(Schema, related_name='attrs')
+    choice = ForeignKey(Choice, blank=True, null=True)
+
+
+class Object(BaseEntity):
+    height = PositiveIntegerField(default=0)
+    width = PositiveIntegerField(default=0)
+
+    attrs = generic.GenericRelation(Attribute, object_id_field='entity_id', content_type_field='entity_type')
+
+    @classmethod
+    def get_schemata_for_model(self):
+        return Schema.objects.all()
 
     def __unicode__(self):
         attrs = {
             'height': self.height,
             'width': self.width,
         }
-        attrs_str = ', '.join('{}={}'.format(*attr_item) for attr_item in attrs.items())
-        return 'Object X ({attrs})'.format(attrs=attrs_str)
+        extra_attrs = {attr.schema.name: attr.value for attr in self.attrs.all()}
+        attrs.update(extra_attrs)
+        return 'Object {}'.format(attrs)

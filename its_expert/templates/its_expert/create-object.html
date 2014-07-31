@@ -1,0 +1,73 @@
+{% load static %}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Create Object</title>
+    <script src="{% static 'admin/js/jquery.js' %}"></script>
+    <script src="{% static 'its_expert/js/jquery.formset.js' %}"></script>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <style>
+        .row {
+            margin-bottom: 16px;
+        }
+        .asteriskField {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="container">
+    {# Form #}
+    <h1>Add Object:</h1>
+    <div class="row">
+        <form method="post">
+            {# Object form #}
+            <div class="form-horizontal">
+                {% crispy object_form %}
+            </div>
+
+            {# Attrs formset #}
+            {{ attrs_formset.management_form }}
+            {% for attr_form in attrs_formset %}
+                <div class="attrs-form">
+                    <div class="row">
+                        {% crispy attr_form %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            {# Add button #}
+            <a class="add-row btn btn-success" href="javascript:void(0)">Add attribute form</a>
+
+            {# Submit button #}
+            <div class="row">
+                <div class="col-lg-offset-2 col-lg-2">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </form>
+
+        <script>
+            {# Dynamic adding and removing attr forms #}
+            $('.attrs-form').formset({prefix: 'attrs'});
+        </script>
+    </div>
+
+    {# Object List #}
+    <h1>Objects:</h1>
+    <div class="row">
+        <div class="col-lg-offset-2 col-lg-10">
+            <ul class="list-unstyled">
+                {% for object in object_list %}
+                    <li>
+                        {{ object }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

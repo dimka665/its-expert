@@ -29,7 +29,7 @@ class CreateObjectView(FormView):
         object_form = self.form_class(prefix=self.object_form_prefix, **form_kwargs)
         attrs_formset = self.attrs_formset_class(prefix=self.attrs_formset_prefix, **form_kwargs)
 
-        return self.render_to_response(self.get_context_data(form=object_form, attrs_formset=attrs_formset))
+        return self.render_to_response(self.get_context_data(object_form=object_form, attrs_formset=attrs_formset))
 
     def post(self, request, *args, **kwargs):
         form_kwargs = self.get_form_kwargs()
@@ -50,7 +50,10 @@ class CreateObjectView(FormView):
                 attribute = attrs_form.save()
                 extra_attrs[attribute.name] = attrs_form.cleaned_data['value']
 
-        Object.objects.create(**object_form.cleaned_data)
+        attrs = object_form.cleaned_data.copy()
+        attrs.update(extra_attrs)
+
+        Object.objects.create(**attrs)
 
         return super(CreateObjectView, self).form_valid(object_form)
 
